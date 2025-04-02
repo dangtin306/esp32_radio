@@ -1,7 +1,5 @@
 #include "test.h"
-#include <AsyncMqttClient.h>  // Thư viện MQTT bất đồng bộ
 
-//-------------------- CẤU HÌNH SIM & AUDIO --------------------
 #define simSerial Serial2
 #define MCU_SIM_BAUDRATE 115200
 #define MCU_SIM_TX_PIN 17
@@ -26,17 +24,10 @@
 
 #define LED_PIN 2
 
-//-------------------- CẤU HÌNH MQTT --------------------
-#define MQTT_HOST "vip.tecom.pro"   // Broker MQTT của bạn (không có "http://")
-#define MQTT_PORT 1883
-
-//-------------------- KHỞI TẠO ĐỐI TƯỢNG --------------------
 String get_device_id();
 String send_device_id();
 
 Audio audio;
-
-// Các biến điều khiển radio, delay, thông tin, … (giữ nguyên)
 unsigned long lastInfoTime = 0;
 unsigned long infoCountTime = 0;
 int infoCount = 0;
@@ -47,42 +38,7 @@ unsigned long delayStartTime = 0;
 const unsigned long delayDuration = 150;
 String device_id;
 
-//-------------------- KHỞI TẠO ĐỐI TƯỢNG MQTT --------------------
-AsyncMqttClient mqttClient;
-TimerHandle_t mqttReconnectTimer;
-
-//-------------------- CALLBACKS MQTT --------------------
-void onMqttConnect(bool sessionPresent) {
-  Serial.println("Đã kết nối tới MQTT broker!");
-  // Đăng ký nhận tin từ topic "test/topic"
-  mqttClient.subscribe("test/topic", 2);
-}
-
-void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
-  Serial.println("Mất kết nối MQTT, thử kết nối lại sau 5 giây...");
-  // Sử dụng FreeRTOS timer để reconnect sau 5 giây
-  xTimerStart(mqttReconnectTimer, 0);
-}
-
-void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
-  Serial.print("Nhận được tin nhắn từ topic [");
-  Serial.print(topic);
-  Serial.print("]: ");
-  String message;
-  for (size_t i = 0; i < len; i++) {
-    message += payload[i];
-  }
-  Serial.println(message);
-  // Ví dụ: nếu nhận lệnh "Bật LED", thực hiện hành động tương ứng
-  if(String(topic) == "test/topic" && message == "Bật LED") {
-    Serial.println("Đã nhận lệnh: Bật LED");
-    // Thêm code điều khiển LED tại đây nếu cần
-  }
-}
-
-//-------------------- SETUP --------------------
 void setup() {
-  // Các thiết lập modem, audio, radio cũ của bạn
   delay(500);
   pinMode(MCU_SIM_EN_PIN, OUTPUT);
   digitalWrite(MCU_SIM_EN_PIN, HIGH);
@@ -116,31 +72,12 @@ void setup() {
   delay(100);
   send_device_id(device_id);
   radio_start(audio);
-
-  // -------------------- CẤU HÌNH MQTT --------------------
-  mqttClient.onConnect(onMqttConnect);
-  mqttClient.onDisconnect(onMqttDisconnect);
-  mqttClient.onMessage(onMqttMessage);
-  mqttClient.setServer(MQTT_HOST, MQTT_PORT);
-
-  // Tạo timer để reconnect MQTT sau 5 giây khi mất kết nối
-  mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(5000), pdFALSE, (void*)0, 
-    [](TimerHandle_t xTimer) {
-      mqttClient.connect();
-    }
-  );
-  
-  // Kết nối MQTT
-  mqttClient.connect();
 }
 
-//-------------------- LOOP --------------------
 void loop() {
   audio.loop();
-  
-  // Các xử lý radio hiện có
-  if (millis() - lastInfoTime > 8000) {
-    Serial.println("No info received in 8 seconds. Restarting radio...");
+  if (millis() - lastInfoTime > 6000) {
+    Serial.println("No info received in 6 seconds. Restarting radio...");
     lastInfoTime = millis();
     radio_start(audio);
   }
@@ -160,7 +97,6 @@ void loop() {
   vTaskDelay(3 / portTICK_PERIOD_MS);
 }
 
-//-------------------- CALLBACK AUDIO --------------------
 void audio_info(const char *info) {
   lastInfoTime = millis();  // Cập nhật thời gian nhận thông báo cuối cùng
   Serial.print("info        ");
@@ -189,6 +125,7 @@ void audio_info(const char *info) {
     return;
   }
   if (infoStr.indexOf("Unexpected") != -1 && infoStr.indexOf("channel") != -1 && infoStr.indexOf("change") != -1) {
+    delay(2000);
     radio_start(audio);
     return;
   }
@@ -200,11 +137,11 @@ void audio_info(const char *info) {
       infoCountTime = currentTime;
     }
     infoCount++;
-    if (infoCount > 2 && !needDelay) {
+    if (infoCount > 1 && !needDelay) {
       needDelay = true;
       delayStartTime = currentTime;
     }
-    if (infoCount > 3) {
+    if (infoCount > 2) {
       infoCount = 0;
       infoCountTime = currentTime;
       needDelay = false;
