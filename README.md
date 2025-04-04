@@ -6,4 +6,4 @@ Libraries:
 
 Audio: [ESP32-audioI2S](https://github.com/schreibfaul1/ESP32-audioI2S)
 
-MQTT: [asd](https://github.com/hmueller01/pubsubclient3)
+MQTT: [pubsubclient3](https://github.com/hmueller01/pubsubclient3)
