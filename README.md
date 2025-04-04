@@ -1,5 +1,7 @@
 Runs on Arduino IDE
 
+Microchip: ESP32-S3
+
 Boards Manager: ESP32 by Espressif Systems ver 3.2.0
 
 Libraries:
