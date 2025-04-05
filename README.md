@@ -2,6 +2,8 @@ Runs on Arduino IDE
 
 Microchip: ESP32-S3
 
+Enable SPRAM if available, and set the flash memory to at least 3MB.
+
 Boards Manager: ESP32 by Espressif Systems ver 3.2.0
 
 Libraries:
