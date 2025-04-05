@@ -10,6 +10,30 @@ const int mqtt_port = 1883;
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+// Hàm xử lý JSON và reset server nếu nhận lệnh reset
+void processJsonAndReset(const String &jsonMessage) {
+  DynamicJsonDocument doc(256);
+  DeserializationError error = deserializeJson(doc, jsonMessage);
+  if (error) {
+    Serial.println("Lỗi khi phân tích cú pháp JSON trong processJsonAndReset.");
+    return;
+  }
+  
+  // Kiểm tra nếu có key "command_code" và giá trị bằng 1
+  if (doc.containsKey("command_code") && doc["command_code"] == 1) {
+    Serial.println("reset server...");
+    // Thực hiện các xử lý khác nếu cần trước khi reset
+    ESP.restart();
+  } else  if (doc.containsKey("command_code") && doc["command_code"] == 2) {
+    Serial.println("reset mạng...");
+    // Thực hiện các xử lý khác nếu cần trước khi reset
+  } else  if (doc.containsKey("command_code") && doc["command_code"] == 3) {
+    Serial.println("reset audio...");
+    // Thực hiện các xử lý khác nếu cần trước khi reset
+    radio_start(audio);
+  }
+}
+
 // Hàm callback xử lý tin nhắn MQTT
 void mqttCallback(char* topic, unsigned char* payload, unsigned int length) {
   String message;
@@ -18,19 +42,9 @@ void mqttCallback(char* topic, unsigned char* payload, unsigned int length) {
   }
   Serial.printf("Nhận được tin nhắn từ topic '%s': %s\n", topic, message.c_str());
   
-  // Nếu tin nhắn dạng JSON thì thử parse
+  // Nếu tin nhắn dạng JSON, gọi hàm xử lý riêng
   if (message.startsWith("{")) {
-    DynamicJsonDocument doc(256);
-    DeserializationError error = deserializeJson(doc, message);
-    if (!error) {
-      // Kiểm tra nếu có key "command_code" và giá trị bằng 1
-      if (doc.containsKey("command_code") && doc["command_code"] == 1) {
-        Serial.println("Nhận lệnh reset. Khởi động lại thiết bị...");
-        ESP.restart();
-      }
-    } else {
-      Serial.println("Lỗi khi phân tích cú pháp JSON.");
-    }
+    processJsonAndReset(message);
   }
   
   // Xây dựng topic gửi phản hồi động: "device/send/<device_id>"
