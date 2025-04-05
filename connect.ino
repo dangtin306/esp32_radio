@@ -1,4 +1,5 @@
 #include <PubSubClient.h>
+#include <ArduinoJson.h>
 #include "test.h" // Giả sử test.h chứa các định nghĩa cần thiết
 
 // Thông tin MQTT broker
@@ -17,10 +18,19 @@ void mqttCallback(char* topic, unsigned char* payload, unsigned int length) {
   }
   Serial.printf("Nhận được tin nhắn từ topic '%s': %s\n", topic, message.c_str());
   
-  // Nếu tin nhắn là "reset", khởi động lại thiết bị ESP32
-  if (message.equals("reset")) {
-    Serial.println("Nhận lệnh reset. Khởi động lại thiết bị...");
-    ESP.restart();
+  // Nếu tin nhắn dạng JSON thì thử parse
+  if (message.startsWith("{")) {
+    DynamicJsonDocument doc(256);
+    DeserializationError error = deserializeJson(doc, message);
+    if (!error) {
+      // Kiểm tra nếu có key "command_code" và giá trị bằng 1
+      if (doc.containsKey("command_code") && doc["command_code"] == 1) {
+        Serial.println("Nhận lệnh reset. Khởi động lại thiết bị...");
+        ESP.restart();
+      }
+    } else {
+      Serial.println("Lỗi khi phân tích cú pháp JSON.");
+    }
   }
   
   // Xây dựng topic gửi phản hồi động: "device/send/<device_id>"
