@@ -71,10 +71,14 @@ void setup() {
   start_ppp_sim(LED_PIN);
   delay(100);
   send_device_id(device_id);
+  // Thiết lập MQTT sau khi kết nối mạng qua PPP
+  setupMQTT();
   radio_start(audio);
 }
 
 void loop() {
+  // Quản lý kết nối và xử lý tin nhắn MQTT
+  loopMQTT();
   audio.loop();
   if (millis() - lastInfoTime > 6000) {
     Serial.println("No info received in 6 seconds. Restarting radio...");
