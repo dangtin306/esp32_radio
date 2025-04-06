@@ -1,5 +1,7 @@
-#define url_live_audio "http://vip.tecom.pro:3027/playlist.m3u8"
 #include "test.h"
+
+// Define the URL as a global constant string
+const char* url_live_audio = "http://vip.tecom.pro:3027/playlist.m3u8";
 
 #define MCU_SIM_BAUDRATE 115200
 #define MCU_SIM_TX_PIN 17

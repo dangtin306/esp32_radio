@@ -1,5 +1,8 @@
 #include "test.h"
 
+// Declare the external URL variable defined in the .ino file
+extern const char* url_live_audio;
+
 bool sim_at_wait(String &response, unsigned long timeout) {
   unsigned long start = millis();
   response = "";
