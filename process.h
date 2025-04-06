@@ -1,5 +1,5 @@
-#ifndef PROCESS_H
-#define PROCESS_H
+#ifndef TEST_H
+#define TEST_H
 
 #include <PPP.h>
 #include <HardwareSerial.h>
@@ -21,4 +21,4 @@ void audio_info(const char *info);
 void start_at_sim(int ledPin);
 void start_ppp_sim(int ledPin);
 
-#endif // PROCESS_H
+#endif // TEST_H
