@@ -50,9 +50,9 @@ void setup() {
   Serial.print("Device ID: ");
   Serial.println(device_id);
   delay(9000);
-  start_at_sim(LED_PIN);  // Gọi hàm
+  start_at_sim(LED_PIN);  // Call the function
   delay(300);
-  Serial.println("\nketnoi!");
+  Serial.println("\nConnected 4g!");
   Network.onEvent(onEvent);
   int attempts_2 = 0;
   bool modemAttached = false;
@@ -71,13 +71,13 @@ void setup() {
   start_ppp_sim(LED_PIN);
   delay(100);
   send_device_id(device_id);
-  // Thiết lập MQTT sau khi kết nối mạng qua PPP
+  // Setup MQTT after connecting to the network via PPP
   setupMQTT();
   radio_start(audio);
 }
 
 void loop() {
-  // Quản lý kết nối và xử lý tin nhắn MQTT
+  // Manage MQTT connection and process MQTT messages
   loopMQTT();
   audio.loop();
   if (millis() - lastInfoTime > 6000) {
@@ -102,12 +102,12 @@ void loop() {
 }
 
 void audio_info(const char *info) {
-  lastInfoTime = millis();  // Cập nhật thời gian nhận thông báo cuối cùng
+  lastInfoTime = millis();  // Update the timestamp for the last received info
   Serial.print("info        ");
   Serial.println(info);
   String infoStr = String(info);
 
-  // Xử lý các điều kiện để khởi động lại radio
+  // Handle conditions to restart the radio
   if (infoStr.indexOf("Request") != -1 && infoStr.indexOf("failed") != -1) {
     radio_start(audio);
     return;
@@ -133,7 +133,7 @@ void audio_info(const char *info) {
     radio_start(audio);
     return;
   }
-  // Xử lý thông báo chứa "connect" và "m3u8"
+  // Handle info containing "connect" and "m3u8"
   if (infoStr.indexOf("connect") != -1 && infoStr.indexOf("m3u8") != -1) {
     unsigned long currentTime = millis();
     if (currentTime - infoCountTime > 2000) {
@@ -153,7 +153,7 @@ void audio_info(const char *info) {
     }
   }
 
-  // Xử lý thông báo chứa "connect" và ".aac"
+  // Handle info containing "connect" and ".aac"
   if (infoStr.indexOf("connect") != -1 && infoStr.indexOf(".aac") != -1) {
     unsigned long currentTime = millis();
     if (currentTime - tsInfoCountTime > 7000) {
