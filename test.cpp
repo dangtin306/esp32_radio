@@ -141,8 +141,8 @@ void checkNetworkAndToggleLED() {
 void radio_start(Audio &audio) {
   delay(200);
   audio.setVolume(21);
-  audio.setPinout(3, 1, 9);  // BCLK, LRC, DOUT từ .ino
-  audio.connecttohost("http://vip.tecom.pro:3027/playlist.m3u8");
+  audio.setPinout(3, 1, 9);  // BCLK, LRC, DOUT
+  audio.connecttohost(url_live_audio);  // Sử dụng URL cố định
 }
 
 void start_at_sim(int ledPin) {

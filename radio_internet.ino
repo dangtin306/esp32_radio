@@ -1,6 +1,6 @@
+#define url_live_audio "http://vip.tecom.pro:3027/playlist.m3u8"
 #include "test.h"
 
-#define simSerial Serial2
 #define MCU_SIM_BAUDRATE 115200
 #define MCU_SIM_TX_PIN 17
 #define MCU_SIM_RX_PIN 18
