@@ -1,4 +1,4 @@
-#include "test.h"
+#include "process.h"
 
 // Define the URL as a global constant string
 const char* url_live_audio = "http://vip.tecom.pro:3027/playlist.m3u8";
@@ -75,7 +75,7 @@ void setup() {
   send_device_id(device_id);
   // Setup MQTT after connecting to the network via PPP
   setupMQTT();
-  radio_start(audio);
+  radio_restart(audio);
 }
 
 void loop() {
@@ -85,13 +85,13 @@ void loop() {
   if (millis() - lastInfoTime > 6000) {
     Serial.println("No info received in 6 seconds. Restarting radio...");
     lastInfoTime = millis();
-    radio_start(audio);
+    radio_restart(audio);
   }
   if (millis() - tsInfoCountTime > 9000 && tsInfoCount < 2) {
     Serial.println("Not enough '.aac' info received in 9 seconds. Restarting radio...");
     tsInfoCountTime = millis();
     tsInfoCount = 0;
-    radio_start(audio);
+    radio_restart(audio);
   }
   if (needDelay) {
     unsigned long elapsed = millis() - delayStartTime;
@@ -111,28 +111,28 @@ void audio_info(const char *info) {
 
   // Handle conditions to restart the radio
   if (infoStr.indexOf("Request") != -1 && infoStr.indexOf("failed") != -1) {
-    radio_start(audio);
+    radio_restart(audio);
     return;
   }
   if (infoStr.indexOf("End") != -1 && infoStr.indexOf("webstream") != -1) {
-    radio_start(audio);
+    radio_restart(audio);
     return;
   }
   if (infoStr.indexOf("Stream") != -1 && infoStr.indexOf("lost") != -1) {
-    radio_start(audio);
+    radio_restart(audio);
     return;
   }
   if (infoStr.indexOf("connect") != -1 && infoStr.indexOf("lost") != -1) {
-    radio_start(audio);
+    radio_restart(audio);
     return;
   }
   if (infoStr.indexOf("framesize") != -1 && infoStr.indexOf("decoding") != -1 && infoStr.indexOf("again") != -1) {
-    radio_start(audio);
+    radio_restart(audio);
     return;
   }
   if (infoStr.indexOf("Unexpected") != -1 && infoStr.indexOf("channel") != -1 && infoStr.indexOf("change") != -1) {
     delay(2000);
-    radio_start(audio);
+    radio_restart(audio);
     return;
   }
   // Handle info containing "connect" and "m3u8"
@@ -151,7 +151,7 @@ void audio_info(const char *info) {
       infoCount = 0;
       infoCountTime = currentTime;
       needDelay = false;
-      radio_start(audio);
+      radio_restart(audio);
     }
   }
 

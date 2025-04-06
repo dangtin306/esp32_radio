@@ -1,5 +1,5 @@
-#ifndef TEST_H
-#define TEST_H
+#ifndef PROCESS_H
+#define PROCESS_H
 
 #include <PPP.h>
 #include <HardwareSerial.h>
@@ -16,9 +16,9 @@ void testClient(const char *host, uint16_t port);
 bool initializeModem();
 bool runSimATCommands();
 void checkNetworkAndToggleLED();
-void radio_start(Audio &audio);
+void radio_restart(Audio &audio);
 void audio_info(const char *info);
 void start_at_sim(int ledPin);
 void start_ppp_sim(int ledPin);
 
-#endif // TEST_H
+#endif // PROCESS_H
