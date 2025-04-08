@@ -16,7 +16,8 @@ void testClient(const char *host, uint16_t port);
 bool initializeModem();
 bool runSimATCommands();
 void checkNetworkAndToggleLED();
-void radio_restart(Audio &audio);
+// Sửa khai báo hàm radio_restart để nhận thêm tham số live_url_audio dạng String
+// void radio_restart(Audio &audio, String live_url_audio);
 void audio_info(const char *info);
 void start_at_sim(int ledPin);
 void start_ppp_sim(int ledPin);

@@ -1,7 +1,5 @@
 #include "process.h"
 
-// Declare the external URL variable defined in the .ino file
-extern const char* url_live_audio;
 
 bool sim_at_wait(String &response, unsigned long timeout) {
   unsigned long start = millis();
@@ -141,12 +139,6 @@ void checkNetworkAndToggleLED() {
   }
 }
 
-void radio_restart(Audio &audio) {
-  delay(200);
-  audio.setVolume(15);
-  audio.setPinout(3, 1, 9);  // BCLK, LRC, DOUT
-  audio.connecttohost(url_live_audio);  // Sử dụng URL cố định
-}
 
 void start_at_sim(int ledPin) {
   int attempts_1 = 0;

@@ -41,7 +41,7 @@ void processJsonAndReset(const String &jsonMessage)
   }
   else if (doc.containsKey("command_code") && doc["command_code"] == 4)
   {
-    const int command_action = doc["command_action"];  // Ép kiểu rõ ràng nếu là int
+    const int command_action = doc["command_action"]; // Ép kiểu rõ ràng nếu là int
     Serial.println("audio control: " + String(command_action));
     // Gọi hàm setVolume (giả sử hàm này nhận int)
     audio.setVolume(command_action);
