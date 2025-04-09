@@ -34,8 +34,8 @@ const char *password = "hictecom31102009a@";
 
 #define LED_PIN 2
 
-String connect_sim();
-String connect_wifi();
+void connect_sim();
+void connect_wifi();
 String get_device_id();
 String send_device_id();
 String get_link_live();
