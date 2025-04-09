@@ -34,13 +34,13 @@ const char *password = "hictecom31102009a@";
 
 #define LED_PIN 2
 
+String connect_sim();
+String connect_wifi();
 String get_device_id();
 String send_device_id();
 String get_link_live();
 String radio_restart();
 String setVolume();
-String connect_sim();
-String connect_wifi();
 
 Audio audio;
 unsigned long lastInfoTime = 0;
@@ -64,7 +64,7 @@ void setup()
   Serial.print("Device ID: ");
   Serial.println(device_id);
   connect_sim();
-  delay(500);
+  delay(700);
   send_device_id(device_id);
   get_link_live(device_id);
   // Setup MQTT after connecting to the network via PPP
