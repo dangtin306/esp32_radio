@@ -22,6 +22,7 @@ String send_device_id();
 String get_link_live();
 String radio_restart();
 String setVolume();
+String loopMQTT();
 
 Audio audio;
 unsigned long lastInfoTime = 0;
