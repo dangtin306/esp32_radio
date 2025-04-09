@@ -1,5 +1,5 @@
 #include <PubSubClient.h>
-#include <ArduinoJson.h>
+
 #include "process.h" // Giả sử process.h chứa các định nghĩa cần thiết
 
 // Thông tin MQTT broker
