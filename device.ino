@@ -46,13 +46,15 @@ void send_device_id(String device_id)
   http.end(); // Đóng kết nối
 }
 
-void get_link_live(String device_id) {
+void get_link_live(String device_id)
+{
   HTTPClient http;
   String req_url = "https://node_js.hust.media/main_2/audio/live/get_link_live?device_id=" + device_id;
   http.begin(req_url);
   int httpCode = http.GET();
 
-  if (httpCode > 0) {
+  if (httpCode > 0)
+  {
     String payload = http.getString();
     Serial.println("Phản hồi từ server: " + payload);
 
@@ -60,30 +62,70 @@ void get_link_live(String device_id) {
     DynamicJsonDocument doc(capacity);
 
     DeserializationError error = deserializeJson(doc, payload);
-    if (error) {
+    if (error)
+    {
       Serial.print("Lỗi parse JSON: ");
       Serial.println(error.f_str());
       return;
     }
 
     // Cập nhật biến toàn cục live_url_audio với giá trị mới từ JSON
-    const char* new_url = doc["api_results"];
-    if (new_url) {
+    const char *new_url = doc["api_results"];
+    if (new_url)
+    {
       live_url_audio = new_url; // Dễ dàng cập nhật giá trị String
       Serial.println("Live link cập nhật: " + live_url_audio);
-    } else {
+    }
+    else
+    {
       Serial.println("Không tìm thấy 'api_results' trong JSON.");
     }
-  } else {
+  }
+  else
+  {
     Serial.println("Lỗi khi gửi yêu cầu GET, mã lỗi: " + String(httpCode));
   }
 
   http.end();
 }
 
-void radio_restart(Audio &audio) {
+void radio_restart(Audio &audio)
+{
+  // Mở Preferences trong chế độ đọc và ghi
+  preferences.begin("settings", false);
+
+  // Kiểm tra flag 'volume_set' xem đã lưu volume chưa
+  if (!preferences.getBool("volume_set", false))
+  {
+    // Nếu chưa lưu (lần đầu khởi động), thiết lập volume mặc định là 15 và lưu vào Preferences
+    volume = 15;
+    preferences.putInt("volume", volume);
+    preferences.putBool("volume_set", true);
+  }
+  else
+  {
+    // Nếu đã lưu, chỉ cần đọc giá trị volume từ Preferences
+    volume = preferences.getInt("volume", 15);
+  }
+
+  // Đóng Preferences sau khi sử dụng
+  preferences.end();
+
+  // (Delay nếu cần thiết để đảm bảo quá trình ghi/đọc hoàn tất)
   delay(200);
-  audio.setVolume(15);
+
+  // Áp dụng các thiết lập cho audio
+  audio.setVolume(volume);
   audio.setPinout(3, 1, 9);
   audio.connecttohost(live_url_audio.c_str());
+}
+
+void setVolume(int newVolume)
+{
+  volume = newVolume;
+  preferences.begin("settings", false);
+  preferences.putInt("volume", volume);
+  preferences.end();
+  Serial.print("New Volume: ");
+  Serial.println(volume);
 }

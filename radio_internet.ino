@@ -1,8 +1,15 @@
 #include "process.h"
+#include <Preferences.h>
+
+Preferences preferences;
 
 // Định nghĩa dưới dạng String toàn cục
-String live_url_audio ;
+String live_url_audio;
 String device_id;
+int volume;
+//  WiFi info
+const char *ssid = "TECOMNEWS";
+const char *password = "hictecom31102009a@";
 
 #define MCU_SIM_BAUDRATE 115200
 #define MCU_SIM_TX_PIN 17
@@ -31,6 +38,9 @@ String get_device_id();
 String send_device_id();
 String get_link_live();
 String radio_restart();
+String setVolume();
+String connect_sim();
+String connect_wifi();
 
 Audio audio;
 unsigned long lastInfoTime = 0;
@@ -47,37 +57,14 @@ void setup()
   delay(500);
   pinMode(MCU_SIM_EN_PIN, OUTPUT);
   digitalWrite(MCU_SIM_EN_PIN, HIGH);
-  resetSIM();
   Serial.begin(115200);
   Serial.println("\n\n\n\n-----------------------\nSystem started!!!!");
-  delay(1000);
+  delay(200);
   device_id = get_device_id();
   Serial.print("Device ID: ");
   Serial.println(device_id);
-  delay(9000);
-  start_at_sim(LED_PIN); // Call the function
-  delay(300);
-  Serial.println("\nConnected sim module!");
-  Network.onEvent(onEvent);
-  int attempts_2 = 0;
-  bool modemAttached = false;
-  while (attempts_2 < 7 && !modemAttached)
-  {
-    modemAttached = initializeModem();
-    if (!modemAttached)
-    {
-      Serial.println("Modem not attached. Retrying...");
-      attempts_2++;
-      delay(2000);
-    }
-  }
-  if (!modemAttached)
-  {
-    Serial.println("Modem failed to attach after 7 attempts.");
-  }
-  delay(100);
-  start_ppp_sim(LED_PIN);
-  delay(100);
+  connect_sim();
+  delay(500);
   send_device_id(device_id);
   get_link_live(device_id);
   // Setup MQTT after connecting to the network via PPP
