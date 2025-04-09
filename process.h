@@ -1,11 +1,16 @@
 #ifndef TEST_H
 #define TEST_H
 
+#include "Audio.h"
 #include <PPP.h>
 #include <HardwareSerial.h>
 #include "Arduino.h"
 #include "WiFi.h"
-#include "Audio.h"
+#include <ETH.h>
+#include <SPI.h>
+#include <ArduinoJson.h>
+#include <Preferences.h>
+
 
 // Khai báo các hàm
 bool sim_at_wait(String &response, unsigned long timeout = 2000);

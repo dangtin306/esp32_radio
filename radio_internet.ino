@@ -1,6 +1,4 @@
 #include "process.h"
-#include <ArduinoJson.h>
-#include <Preferences.h>
 
 Preferences preferences;
 
@@ -45,7 +43,7 @@ void setup()
   device_id = get_device_id();
   Serial.print("Device ID: ");
   Serial.println(device_id);
-  connect_lan();
+  connect_wifi();
   delay(700);
   send_device_id(device_id);
   get_link_live(device_id);

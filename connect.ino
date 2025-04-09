@@ -1,7 +1,3 @@
-#include "WiFi.h"
-#include <ETH.h>
-#include <SPI.h>
-
 //  WiFi info
 const char *ssid = "TECOMNEWS";
 const char *password = "hictecom31102009a@";
