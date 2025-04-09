@@ -89,5 +89,9 @@ void connect_lan()
   Network.onEvent(onEvent_lan);  // onEvent_lan được định nghĩa ở file process.cpp
   SPI.begin(ETH_SPI_SCK, ETH_SPI_MISO, ETH_SPI_MOSI);
   ETH.begin(ETH_PHY_TYPE, ETH_PHY_ADDR, ETH_PHY_CS, ETH_PHY_IRQ, ETH_PHY_RST, SPI);
-  while (!eth_connected) delay(100);
+  while (!eth_connected) 
+  {
+    delay(100);
+    Serial.print(".");
+  }
 }
