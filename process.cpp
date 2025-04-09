@@ -36,7 +36,7 @@ void resetSIM() {
   delay(500);
 }
 
-void onEvent(arduino_event_id_t event, arduino_event_info_t info) {
+void onEvent_sim(arduino_event_id_t event, arduino_event_info_t info) {
   switch (event) {
     case ARDUINO_EVENT_PPP_START: Serial.println("PPP Started"); break;
     case ARDUINO_EVENT_PPP_CONNECTED: Serial.println("PPP Connected"); break;
@@ -44,6 +44,34 @@ void onEvent(arduino_event_id_t event, arduino_event_info_t info) {
     case ARDUINO_EVENT_PPP_LOST_IP: Serial.println("PPP Lost IP"); break;
     case ARDUINO_EVENT_PPP_DISCONNECTED: Serial.println("PPP Disconnected"); break;
     case ARDUINO_EVENT_PPP_STOP: Serial.println("PPP Stopped"); break;
+    default: break;
+  }
+}
+
+void onEvent_lan(arduino_event_id_t event, arduino_event_info_t info) {
+  switch (event) {
+    case ARDUINO_EVENT_ETH_START:
+      Serial.println("ETH Started");
+      ETH.setHostname("esp32-eth0");  //set eth hostname here
+      break;
+    case ARDUINO_EVENT_ETH_CONNECTED: Serial.println("ETH Connected"); break;
+    case ARDUINO_EVENT_ETH_GOT_IP:
+      Serial.printf("ETH Got IP: '%s'\n", esp_netif_get_desc(info.got_ip.esp_netif));
+      Serial.println(ETH);
+      eth_connected = true;
+      break;
+    case ARDUINO_EVENT_ETH_LOST_IP:
+      Serial.println("ETH Lost IP");
+      eth_connected = false;
+      break;
+    case ARDUINO_EVENT_ETH_DISCONNECTED:
+      Serial.println("ETH Disconnected");
+      eth_connected = false;
+      break;
+    case ARDUINO_EVENT_ETH_STOP:
+      Serial.println("ETH Stopped");
+      eth_connected = false;
+      break;
     default: break;
   }
 }

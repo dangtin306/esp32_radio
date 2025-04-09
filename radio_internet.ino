@@ -1,4 +1,5 @@
 #include "process.h"
+#include <Preferences.h>
 
 Preferences preferences;
 
@@ -35,15 +36,13 @@ const unsigned long delayDuration = 150;
 void setup()
 {
   delay(500);
-  pinMode(MCU_SIM_EN_PIN, OUTPUT);
-  digitalWrite(MCU_SIM_EN_PIN, HIGH);
   Serial.begin(115200);
   Serial.println("\n\n\n\n-----------------------\nSystem started!!!!");
   delay(200);
   device_id = get_device_id();
   Serial.print("Device ID: ");
   Serial.println(device_id);
-  connect_wifi();
+  connect_lan();
   delay(700);
   send_device_id(device_id);
   get_link_live(device_id);

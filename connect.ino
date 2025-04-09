@@ -1,15 +1,17 @@
-//  WiFi info
+// WiFi info
 const char *ssid = "TECOMNEWS";
 const char *password = "hictecom31102009a@";
 
-//  Sim info
+// Sim info
 #define MCU_SIM_BAUDRATE 115200
+#define PPP_MODEM_FC ESP_MODEM_FLOW_CONTROL_NONE
+#define PPP_MODEM_MODEL PPP_MODEM_SIM7600
+#define PPP_MODEM_APN "internet"
+#define PPP_MODEM_PIN "0000"
+// Sim GPIOs
 #define MCU_SIM_TX_PIN 17
 #define MCU_SIM_RX_PIN 18
 #define MCU_SIM_EN_PIN 4
-
-#define PPP_MODEM_APN "internet"
-#define PPP_MODEM_PIN "0000"
 #define PPP_MODEM_RST -1
 #define PPP_MODEM_RST_LOW false
 #define PPP_MODEM_RST_DELAY 200
@@ -17,12 +19,13 @@ const char *password = "hictecom31102009a@";
 #define PPP_MODEM_RX 18
 #define PPP_MODEM_RTS -1
 #define PPP_MODEM_CTS -1
-#define PPP_MODEM_FC ESP_MODEM_FLOW_CONTROL_NONE
-#define PPP_MODEM_MODEL PPP_MODEM_SIM7600
 
-//  Lan info
+// Lan info
+#define USE_TWO_ETH_PORTS 0
+#define ETH_PHY_TYPE ETH_PHY_W5500
+// Lan GPIOs
 #define ETH_PHY_ADDR 1
-#define ETH_PHY_CS 14
+#define ETH_PHY_CS 10
 #define ETH_PHY_IRQ 2
 #define ETH_PHY_RST -1
 #define ETH_SPI_SCK 13
@@ -34,12 +37,15 @@ const char *password = "hictecom31102009a@";
 
 void connect_sim()
 {
+  delay(300);
+  pinMode(MCU_SIM_EN_PIN, OUTPUT);
+  digitalWrite(MCU_SIM_EN_PIN, HIGH);
   resetSIM();
   delay(9000);
   start_at_sim(LED_PIN); // Call the function
   delay(300);
   Serial.println("\nConnected sim module!");
-  Network.onEvent(onEvent);
+  Network.onEvent(onEvent_sim);
   int attempts_2 = 0;
   bool modemAttached = false;
   while (attempts_2 < 7 && !modemAttached)
@@ -76,42 +82,12 @@ void connect_wifi()
   Serial.println(WiFi.localIP());
 }
 
-static bool eth_connected = false;
-
-void onEvent(arduino_event_id_t event, arduino_event_info_t info) {
-  switch (event) {
-    case ARDUINO_EVENT_ETH_START:
-      Serial.println("ETH Started");
-      ETH.setHostname("esp32-eth0");  //set eth hostname here
-      break;
-    case ARDUINO_EVENT_ETH_CONNECTED: Serial.println("ETH Connected"); break;
-    case ARDUINO_EVENT_ETH_GOT_IP:
-      Serial.printf("ETH Got IP: '%s'\n", esp_netif_get_desc(info.got_ip.esp_netif));
-      Serial.println(ETH);
-      eth_connected = true;
-      break;
-    case ARDUINO_EVENT_ETH_LOST_IP:
-      Serial.println("ETH Lost IP");
-      eth_connected = false;
-      break;
-    case ARDUINO_EVENT_ETH_DISCONNECTED:
-      Serial.println("ETH Disconnected");
-      eth_connected = false;
-      break;
-    case ARDUINO_EVENT_ETH_STOP:
-      Serial.println("ETH Stopped");
-      eth_connected = false;
-      break;
-    default: break;
-  }
-}
-
+bool eth_connected = false;
 
 void connect_lan()
 {
-  Network.onEvent(onEvent);
+  Network.onEvent(onEvent_lan);  // onEvent_lan được định nghĩa ở file process.cpp
   SPI.begin(ETH_SPI_SCK, ETH_SPI_MISO, ETH_SPI_MOSI);
   ETH.begin(ETH_PHY_TYPE, ETH_PHY_ADDR, ETH_PHY_CS, ETH_PHY_IRQ, ETH_PHY_RST, SPI);
   while (!eth_connected) delay(100);
 }
-
