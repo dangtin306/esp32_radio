@@ -8,11 +8,6 @@ String live_url_audio;
 String device_id;
 int volume;
 
-#define I2S_DOUT 9
-#define I2S_BCLK 3
-#define I2S_LRC 1
-
-#define LED_PIN 2
 
 void connect_sim();
 void connect_wifi();
@@ -22,7 +17,7 @@ String send_device_id();
 String get_link_live();
 String radio_restart();
 String setVolume();
-String loopMQTT();
+void loopMQTT();
 
 Audio audio;
 unsigned long lastInfoTime = 0;

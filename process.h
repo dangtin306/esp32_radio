@@ -12,6 +12,11 @@
 
 extern bool eth_connected;
 
+// audio GPIO
+const int I2S_DOUT = 9;
+const int I2S_BCLK = 3;
+const int I2S_LRC = 1;
+const int LED_PIN = 2;
 // Khai báo các hàm
 bool sim_at_wait(String &response, unsigned long timeout = 2000);
 bool sim_at_cmd(String cmd);
